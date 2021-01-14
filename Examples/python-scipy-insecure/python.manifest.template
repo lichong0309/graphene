@@ -6,17 +6,15 @@ libos.entrypoint = "file:$(PYTHONEXEC)"
 
 # Graphene environment, including the path of the library OS and the debug
 # option (inline/none).
-loader.preload = "file:$(GRAPHENEDIR)/Runtime/libsysdb.so"
+loader.preload = "file:$(RUNTIMEDIR)/libsysdb.so"
 loader.debug_type = "$(GRAPHENEDEBUG)"
 
 # Read application arguments directly from the command line. Don't use this on production!
 loader.insecure__use_cmdline_argv = 1
 
 # Environment variables for Python
-loader.env.LD_LIBRARY_PATH = "$(PYTHONHOME)/lib:/lib:$(ARCH_LIBDIR):/usr/lib:/usr/$(ARCH_LIBDIR)"
-loader.env.PATH = "$(PYTHONHOME)/bin:/usr/bin:/bin"
-loader.env.PYTHONHOME = "$(PYTHONHOME)"
-loader.env.PYTHONPATH = "$(PYTHONHOME):$(PYTHONHOME)/plat-$(SYS):$(PYTHONDISTHOME):$(PYTHONHOME)/lib-dynload"
+loader.env.LD_LIBRARY_PATH = "$(PYTHON_STDLIB)/lib:/lib:$(ARCH_LIBDIR):/usr/lib:/usr/$(ARCH_LIBDIR)"
+loader.env.PATH = "$(PYTHON_STDLIB)/bin:/usr/bin:/bin"
 loader.env.HOME = "/home/user"
 
 # Mounted FSes. The following "chroot" FSes mount a part of the host FS into the
@@ -25,7 +23,7 @@ loader.env.HOME = "/home/user"
 # Default glibc files, mounted from the Runtime directory in GRAPHENEDIR.
 fs.mount.lib.type = "chroot"
 fs.mount.lib.path = "/lib"
-fs.mount.lib.uri = "file:$(GRAPHENEDIR)/Runtime"
+fs.mount.lib.uri = "file:$(RUNTIMEDIR)"
 
 # Host-level libraries (e.g., /lib/x86_64-linux-gnu) required by the Python executable
 fs.mount.lib2.type = "chroot"
@@ -39,13 +37,13 @@ fs.mount.usr.uri = "file:/usr"
 
 # Mount $PYTHONHOME
 fs.mount.pyhome.type = "chroot"
-fs.mount.pyhome.path = "$(PYTHONHOME)"
-fs.mount.pyhome.uri = "file:$(PYTHONHOME)"
+fs.mount.pyhome.path = "$(PYTHON_STDLIB)"
+fs.mount.pyhome.uri = "file:$(PYTHON_STDLIB)"
 
 # Mount $PYTHONDISTHOME
 fs.mount.pydisthome.type = "chroot"
-fs.mount.pydisthome.path = "$(PYTHONDISTHOME)"
-fs.mount.pydisthome.uri = "file:$(PYTHONDISTHOME)"
+fs.mount.pydisthome.path = "$(PYTHON_DISTLIB)"
+fs.mount.pydisthome.uri = "file:$(PYTHON_DISTLIB)"
 
 # Mount /tmp
 fs.mount.tmp.type = "chroot"
@@ -85,35 +83,29 @@ sgx.thread_num = 32
 sgx.trusted_files.python = "file:$(PYTHONEXEC)"
 
 # Glibc libraries
-sgx.trusted_files.ld = "file:$(GRAPHENEDIR)/Runtime/ld-linux-x86-64.so.2"
-sgx.trusted_files.libc = "file:$(GRAPHENEDIR)/Runtime/libc.so.6"
-sgx.trusted_files.libm = "file:$(GRAPHENEDIR)/Runtime/libm.so.6"
-sgx.trusted_files.libdl = "file:$(GRAPHENEDIR)/Runtime/libdl.so.2"
-sgx.trusted_files.librt = "file:$(GRAPHENEDIR)/Runtime/librt.so.1"
-sgx.trusted_files.libutil = "file:$(GRAPHENEDIR)/Runtime/libutil.so.1"
-sgx.trusted_files.libpthread = "file:$(GRAPHENEDIR)/Runtime/libpthread.so.0"
+sgx.trusted_files.ld = "file:$(RUNTIMEDIR)/ld-linux-x86-64.so.2"
+sgx.trusted_files.libc = "file:$(RUNTIMEDIR)/libc.so.6"
+sgx.trusted_files.libm = "file:$(RUNTIMEDIR)/libm.so.6"
+sgx.trusted_files.libdl = "file:$(RUNTIMEDIR)/libdl.so.2"
+sgx.trusted_files.librt = "file:$(RUNTIMEDIR)/librt.so.1"
+sgx.trusted_files.libutil = "file:$(RUNTIMEDIR)/libutil.so.1"
+sgx.trusted_files.libpthread = "file:$(RUNTIMEDIR)/libpthread.so.0"
 
 # Other libraries
 sgx.trusted_files.libz = "file:$(ARCH_LIBDIR)/libz.so.1"
 sgx.trusted_files.libbz2 = "file:$(ARCH_LIBDIR)/libbz2.so.1.0"
 sgx.trusted_files.liblzma = "file:$(ARCH_LIBDIR)/liblzma.so.5"
 sgx.trusted_files.libexpat = "file:$(ARCH_LIBDIR)/libexpat.so.1"
-# [Ubuntu16.04] sgx.trusted_files.ctypes = "file:$(PYTHONHOME)/lib-dynload/_ctypes.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu18.04] sgx.trusted_files.ctypes = "file:$(PYTHONHOME)/lib-dynload/_ctypes.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu16.04] sgx.trusted_files.hashlib = "file:$(PYTHONHOME)/lib-dynload/_hashlib.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu18.04] sgx.trusted_files.hashlib = "file:$(PYTHONHOME)/lib-dynload/_hashlib.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu16.04] sgx.trusted_files.ssl = "file:$(PYTHONHOME)/lib-dynload/_ssl.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu18.04] sgx.trusted_files.ssl = "file:$(PYTHONHOME)/lib-dynload/_ssl.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu16.04] sgx.trusted_files.lapack_lite = "file:$(PYTHONDISTHOME)/numpy/linalg/lapack_lite.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu18.04] sgx.trusted_files.lapack_lite = "file:$(PYTHONDISTHOME)/numpy/linalg/lapack_lite.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu16.04] sgx.trusted_files.multiarray = "file:$(PYTHONDISTHOME)/numpy/core/multiarray.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu18.04] sgx.trusted_files.multiarray = "file:$(PYTHONDISTHOME)/numpy/core/multiarray.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu16.04] sgx.trusted_files.sparsetools = "file:$(PYTHONDISTHOME)/scipy/sparse/_sparsetools.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
-# [Ubuntu18.04] sgx.trusted_files.sparsetools = "file:$(PYTHONDISTHOME)/scipy/sparse/_sparsetools.cpython-$(PYTHONSHORTVERSION)m-$(PYTHON_ARCH_LONG).so"
+sgx.trusted_files.ctypes = "file:$(PYTHON_STDLIB)/lib-dynload/_ctypes$(PYTHON_EXT_SUFFIX)"
+sgx.trusted_files.hashlib = "file:$(PYTHON_STDLIB)/lib-dynload/_hashlib$(PYTHON_EXT_SUFFIX)"
+sgx.trusted_files.ssl = "file:$(PYTHON_STDLIB)/lib-dynload/_ssl$(PYTHON_EXT_SUFFIX)"
+sgx.trusted_files.lapack_lite = "file:$(PYTHON_DISTLIB)/numpy/linalg/lapack_lite$(PYTHON_EXT_SUFFIX)"
+sgx.trusted_files.multiarray = "file:$(PYTHON_DISTLIB)/numpy/core/multiarray$(PYTHON_EXT_SUFFIX)"
+sgx.trusted_files.sparsetools = "file:$(PYTHON_DISTLIB)/scipy/sparse/_sparsetools$(PYTHON_EXT_SUFFIX)"
 
 # SGX untrusted (allowed) files/directories
 sgx.allowed_files.scripts = "file:scripts"
 sgx.allowed_files.tmp = "file:/tmp"
 sgx.allowed_files.etc = "file:/etc"
-sgx.allowed_files.pyhome = "file:$(PYTHONHOME)"
-sgx.allowed_files.pydisthome = "file:$(PYTHONDISTHOME)"
+sgx.allowed_files.pyhome = "file:$(PYTHON_STDLIB)"
+sgx.allowed_files.pydisthome = "file:$(PYTHON_DISTLIB)"

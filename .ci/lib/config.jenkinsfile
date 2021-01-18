@@ -18,3 +18,5 @@ import os, sysconfig
 print(sysconfig.get_paths(vars={'base': os.environ['PREFIX']})['purelib'])
 "''').trim()
 env.PYTHONPATH = python_test_purelib + ':' + env.WORKSPACE + '/Scripts'
+
+sh 'printenv'

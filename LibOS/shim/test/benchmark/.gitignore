@@ -1,7 +1,6 @@
 /*.manifest
 
 /manifest
-/pal_loader
 
 /fork_latency
 /rpc_latency
